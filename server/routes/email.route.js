@@ -56,7 +56,16 @@ router.post("/", async (req, res) => {
               const parsed = await simpleParser(buffer);
 
               message.body = parsed.html || parsed.text;
-              message.headers = parsed.headers;
+              message.from = parsed.headers
+                .get("from")
+                .value.map((v) => v.address)
+                .join(", ");
+              message.to = parsed.headers
+                .get("to")
+                .value.map((v) => v.address)
+                .join(", ");
+              message.subject = parsed.headers.get("subject").value;
+              message.date = parsed.headers.get("date").value;
             } catch (err) {
               console.log("Error parsing email: " + err);
             }
@@ -65,6 +74,7 @@ router.post("/", async (req, res) => {
         msg.once("attributes", function (attrs) {
           message.attributes = attrs;
         });
+
         msg.once("end", function () {
           messages.push(message);
         });
@@ -82,32 +92,21 @@ router.post("/", async (req, res) => {
         console.log("Done fetching all messages!");
         imap.end();
 
+        console.log(messages.headers);
+
         // Beautify the messages
         const beautifiedMessages = messages.map((message) => {
           return {
             seqno: message.seqno,
-            from: message.headers.from
-              ? message.headers.from.value.map((v) => v.address).join(", ")
-              : "",
-            to: message.headers.to
-              ? message.headers.to.value.map((v) => v.address).join(", ")
-              : "",
-            subject: message.headers.subject,
-            date: message.headers.date,
+            from: message.from,
+            to: message.to,
+            subject: message.subject,
+            date: message.date,
             body: message.body,
           };
         });
 
-        // Pretty print the JSON response
-        const prettyPrintedMessages = JSON.stringify(
-          beautifiedMessages,
-          null,
-          2
-        );
-
-        console.log(prettyPrintedMessages);
-
-        res.send(prettyPrintedMessages);
+        res.send(JSON.stringify(beautifiedMessages, null, 2));
       });
     });
   });
