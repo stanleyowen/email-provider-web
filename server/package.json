@@ -1,0 +1,27 @@
+{
+  "name": "email-provider",
+  "version": "1.0.0",
+  "description": "Backend Server for Email Provider Web Application",
+  "main": "main.js",
+  "devDependencies": {},
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.1",
+    "helmet": "^8.0.0",
+    "node-imap": "^0.9.6"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stanleyowen/email-provider-web.git"
+  },
+  "author": "Stanley Owen <stanleyowen06@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stanleyowen/email-provider-web/issues"
+  },
+  "homepage": "https://github.com/stanleyowen/email-provider-web#readme"
+}
