@@ -1,15 +1,6 @@
 const router = require("express").Router();
 const Imap = require("node-imap");
-
-// Escape html characters
-const escapeHtml = (unsafe) => {
-  return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-};
+const { simpleParser } = require("mailparser");
 
 router.post("/", async (req, res) => {
   // Get the email address, password, and host from the body
@@ -18,14 +9,10 @@ router.post("/", async (req, res) => {
   // Check if the email, password, and host are provided
   if (!email || !password || !host) {
     return res.status(400).send(
-      JSON.stringify(
-        {
-          code: 403,
-          error: "Email, password, and host are required",
-        },
-        null,
-        2
-      )
+      JSON.stringify({
+        code: 403,
+        error: "Email, password, and host are required",
+      })
     );
   }
 
@@ -53,22 +40,25 @@ router.post("/", async (req, res) => {
 
       const messages = [];
       const f = imap.seq.fetch("1:*", {
-        bodies: ["HEADER.FIELDS (FROM TO SUBJECT DATE)", "TEXT"],
+        bodies: "",
         struct: true,
       });
 
       f.on("message", function (msg, seqno) {
-        const message = { seqno, headers: "", body: "", attributes: null };
+        const message = { seqno, headers: {}, body: "", attributes: null };
         msg.on("body", function (stream, info) {
           let buffer = "";
           stream.on("data", function (chunk) {
             buffer += chunk.toString("utf8");
           });
-          stream.once("end", function () {
-            if (info.which === "TEXT") {
-              message.body = escapeHtml(buffer);
-            } else {
-              message.headers = Imap.parseHeader(buffer);
+          stream.once("end", async function () {
+            try {
+              const parsed = await simpleParser(buffer);
+
+              message.body = parsed.html || parsed.text;
+              message.headers = parsed.headers;
+            } catch (err) {
+              console.log("Error parsing email: " + err);
             }
           });
         });
@@ -96,8 +86,12 @@ router.post("/", async (req, res) => {
         const beautifiedMessages = messages.map((message) => {
           return {
             seqno: message.seqno,
-            from: message.headers.from,
-            to: message.headers.to,
+            from: message.headers.from
+              ? message.headers.from.value.map((v) => v.address).join(", ")
+              : "",
+            to: message.headers.to
+              ? message.headers.to.value.map((v) => v.address).join(", ")
+              : "",
             subject: message.headers.subject,
             date: message.headers.date,
             body: message.body,
@@ -112,6 +106,7 @@ router.post("/", async (req, res) => {
         );
 
         console.log(prettyPrintedMessages);
+
         res.send(prettyPrintedMessages);
       });
     });

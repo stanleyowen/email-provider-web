@@ -9,6 +9,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.1",
     "helmet": "^8.0.0",
+    "mailparser": "^3.7.2",
     "node-imap": "^0.9.6"
   },
   "scripts": {
