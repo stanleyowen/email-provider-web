@@ -7,7 +7,7 @@ import { AuthInterface } from "../lib/interfaces.lib";
 
 type TransitionProps = Omit<SlideProps, "direction">;
 
-const Auth = ({ handleCredential }: AuthInterface) => {
+const Auth = ({ auth, handleCredential }: AuthInterface) => {
   const [status, setStatus] = useState<{
     isError: boolean;
     message: string | null;
@@ -69,13 +69,8 @@ const Auth = ({ handleCredential }: AuthInterface) => {
           handleCredential({
             isLoading: false,
             loggedIn: true,
+            emails: res.data,
           });
-
-          // Redirect the user to the home page
-          // eslint-disable-next-line no-restricted-globals
-          // location.href = "/";
-
-          return;
         })
         .catch((err) => {
           parseError(err.response.data.error); // Display the error message
@@ -131,7 +126,7 @@ const Auth = ({ handleCredential }: AuthInterface) => {
               className="w-100"
               value={data.email}
               required
-              disabled={isLoading}
+              disabled={isLoading || auth.isLoading}
               onChange={(e) => handleData("email", e.target.value)}
             />
           </Grid2>
@@ -144,7 +139,7 @@ const Auth = ({ handleCredential }: AuthInterface) => {
               className="w-100"
               value={data.password}
               required
-              disabled={isLoading}
+              disabled={isLoading || auth.isLoading}
               onChange={(e) => handleData("password", e.target.value)}
             />
           </Grid2>
@@ -156,7 +151,7 @@ const Auth = ({ handleCredential }: AuthInterface) => {
               className="w-100"
               value={data.incomingMailServer}
               required
-              disabled={isLoading}
+              disabled={isLoading || auth.isLoading}
               onChange={(e) => handleData("incomingMailServer", e.target.value)}
             />
           </Grid2>
@@ -168,7 +163,7 @@ const Auth = ({ handleCredential }: AuthInterface) => {
               className="w-100"
               value={data.outgoingMailServer}
               required
-              disabled={isLoading}
+              disabled={isLoading || auth.isLoading}
               onChange={(e) => handleData("outgoingMailServer", e.target.value)}
             />
           </Grid2>
@@ -176,7 +171,7 @@ const Auth = ({ handleCredential }: AuthInterface) => {
           <Grid2 size={12}>
             <LoadingButton
               variant="outlined"
-              loading={isLoading}
+              loading={isLoading || auth.isLoading}
               onClick={() => {
                 setLoading(true);
                 handleLogin();

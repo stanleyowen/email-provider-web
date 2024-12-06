@@ -24,23 +24,12 @@ export default function App() {
   const [auth, setAuth] = useState<{
     isLoading: boolean;
     loggedIn: boolean;
+    emails: any[];
   }>({
-    isLoading: false,
+    isLoading: true,
     loggedIn: false,
+    emails: [],
   });
-
-  useEffect(() => {
-    const { isLoading, loggedIn } = auth;
-
-    if (!isLoading) {
-      if (!loggedIn && !window.location.pathname.startsWith("/auth"))
-        // eslint-disable-next-line no-restricted-globals
-        location.href = "/auth";
-      else if (loggedIn && window.location.pathname.startsWith("/auth"))
-        // eslint-disable-next-line no-restricted-globals
-        location.href = "/";
-    }
-  }, [auth]);
 
   const handleCredential = useCallback((a: any) => {
     if (a.id && a.value) setAuth({ ...auth, [a.id]: a.value });
@@ -71,6 +60,46 @@ export default function App() {
     },
     [properties]
   );
+
+  useEffect(() => {
+    // Check if the user is not logged in and the credentials are stored in the local storage
+    if (
+      localStorage.getItem("credentials") &&
+      auth.isLoading &&
+      !auth.loggedIn
+    ) {
+      // Get the credentials from the local storage
+      const data = JSON.parse(localStorage.getItem("credentials")!);
+
+      // Make the POST request to the server to validate the credentials
+      axios
+        .post(`${process.env.REACT_APP_API_URL}/mail/`, data)
+        .then((res) => {
+          setAuth({
+            isLoading: false,
+            loggedIn: true,
+            emails: res.data,
+          });
+        })
+        .catch((err) => {
+          setAuth((prevAuth) => ({ ...prevAuth, isLoading: false }));
+          console.error(err);
+        });
+    } else {
+      setAuth((prevAuth) => ({ ...prevAuth, isLoading: false }));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!auth.isLoading) {
+      if (!auth.loggedIn && !window.location.pathname.startsWith("/auth"))
+        // eslint-disable-next-line no-restricted-globals
+        location.href = "/auth";
+      else if (auth.loggedIn && window.location.pathname.startsWith("/auth"))
+        // eslint-disable-next-line no-restricted-globals
+        location.href = "/";
+    }
+  }, [auth]);
 
   return (
     <Router>
@@ -104,7 +133,7 @@ export default function App() {
         />
         <Route
           path="/auth"
-          element={<Auth handleCredential={handleCredential} />}
+          element={<Auth auth={auth} handleCredential={handleCredential} />}
         />
       </Routes>
     </Router>

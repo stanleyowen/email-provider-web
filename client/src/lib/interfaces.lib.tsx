@@ -1,4 +1,5 @@
 export interface AuthInterface {
+  auth: any;
   handleCredential: any;
 }
 
