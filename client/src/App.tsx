@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { getTokenValue } from "./lib/functions.component";
 import { LinearProgress, CircularProgress } from "@mui/material";
+import axios from "axios";
 
 import SideBar from "./components/sidebar.component";
 import Auth from "./components/auth.component";
 import AppLayout from "./components/app.component";
-import { EnvConfiguration } from "./lib/interfaces.lib";
 
 process.env.NODE_ENV === "production"
   ? require("./App.min.css")
@@ -14,34 +13,25 @@ process.env.NODE_ENV === "production"
 
 // eslint-disable-next-line
 export default function App() {
+  const [mails, setMails] = useState<any>([]);
+
   const [properties, setProperties] = useState<any>({
     action: 0,
     activeTab: window.localStorage.getItem("tab-session") ?? "home",
     history: [window.localStorage.getItem("tab-session") ?? "home"],
   });
+
   const [auth, setAuth] = useState<{
     isLoading: boolean;
     loggedIn: boolean;
   }>({
-    isLoading: true,
+    isLoading: false,
     loggedIn: false,
   });
 
-  const config: EnvConfiguration = {
-    apiKey: process.env.REACT_APP_API_KEY,
-    authDomain: process.env.REACT_APP_AUTH_DOMAIN,
-    projectId: process.env.REACT_APP_PROJECT_ID,
-    appId: process.env.REACT_APP_ID,
-    measurementId: process.env.REACT_APP_MEASUREMENT_ID,
-  };
-
-  useEffect(() => {
-    const userEmail = getTokenValue("email")?.split("@")[0] + "-token";
-    const userToken = getTokenValue("token");
-  }, []);
-
   useEffect(() => {
     const { isLoading, loggedIn } = auth;
+
     if (!isLoading) {
       if (!loggedIn && !window.location.pathname.startsWith("/auth"))
         // eslint-disable-next-line no-restricted-globals
@@ -93,7 +83,6 @@ export default function App() {
                 <SideBar properties={properties} handleChange={handleChange} />
                 <AppLayout
                   auth={auth}
-                  config={config}
                   properties={properties}
                   handleChange={handleChange}
                 />
@@ -115,7 +104,7 @@ export default function App() {
         />
         <Route
           path="/auth"
-          element={<Auth config={config} handleCredential={handleCredential} />}
+          element={<Auth handleCredential={handleCredential} />}
         />
       </Routes>
     </Router>
