@@ -5,7 +5,7 @@ const nodemailer = require("nodemailer");
 
 router.post("/", async (req, res) => {
   // Get the email address, password, and host from the body
-  const { email, password, host } = req.body;
+  const { email, password, incomingMailServer: host, startId } = req.body;
 
   // Check if the email, password, and host are provided
   if (!email || !password || !host) {
@@ -40,7 +40,7 @@ router.post("/", async (req, res) => {
       }
 
       const messages = [];
-      const f = imap.seq.fetch("1:*", {
+      const f = imap.seq.fetch(startId + ":" + (startId + 50), {
         bodies: "",
         struct: true,
       });
@@ -123,8 +123,15 @@ router.post("/", async (req, res) => {
   imap.connect();
 });
 
-router.post("/", async (req, res) => {
-  const { email, password, host, to, subject, text } = req.body;
+router.post("/send", async (req, res) => {
+  const {
+    email,
+    password,
+    outgoingMailServer: host,
+    to,
+    subject,
+    text,
+  } = req.body;
 
   if (!email || !password || !host || !to || !subject || !text) {
     return res.status(400).send(
