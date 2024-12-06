@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const Imap = require("node-imap");
 const { simpleParser } = require("mailparser");
+const nodemailer = require("nodemailer");
 
 router.post("/", async (req, res) => {
   // Get the email address, password, and host from the body
@@ -120,6 +121,49 @@ router.post("/", async (req, res) => {
   });
 
   imap.connect();
+});
+
+router.post("/", async (req, res) => {
+  const { email, password, host, to, subject, text } = req.body;
+
+  if (!email || !password || !host || !to || !subject || !text) {
+    return res.status(400).send(
+      JSON.stringify({
+        code: 403,
+        error: "Email, password, host, to, subject, and text are required",
+      })
+    );
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: host,
+    port: 587,
+    secure: false,
+    auth: {
+      user: email,
+      pass: password,
+    },
+  });
+
+  const mailOptions = {
+    from: email,
+    to: to,
+    subject: subject,
+    text: text,
+  };
+
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+      return res.status(500).json({
+        code: 500,
+        error: "Failed to send email",
+      });
+    } else {
+      console.log("Email sent: " + info.response);
+      res.send(JSON.stringify({ message: "Email sent" }, null, 2));
+    }
+  });
 });
 
 module.exports = router;
