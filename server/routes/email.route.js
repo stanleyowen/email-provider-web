@@ -65,8 +65,9 @@ router.post("/", async (req, res) => {
                 .get("to")
                 .value.map((v) => v.address)
                 .join(", ");
-              message.subject = parsed.headers.get("subject").value;
-              message.date = parsed.headers.get("date").value;
+
+              message.subject = parsed.headers.get("subject");
+              message.date = parsed.headers.get("date");
             } catch (err) {
               console.log("Error parsing email: " + err);
             }
