@@ -13,8 +13,6 @@ process.env.NODE_ENV === "production"
 
 // eslint-disable-next-line
 export default function App() {
-  const [mails, setMails] = useState<any>([]);
-
   const [properties, setProperties] = useState<any>({
     action: 0,
     activeTab: window.localStorage.getItem("tab-session") ?? "home",
@@ -109,11 +107,17 @@ export default function App() {
           element={
             auth.loggedIn ? (
               <div>
+                <div className="backdrop-overlay"></div>
+                <div className="backdrop">
+                  <div className="acrylic-material"></div>
+                  <div className="backdrop-image" id="backdrop-image"></div>
+                </div>
                 <SideBar properties={properties} handleChange={handleChange} />
                 <AppLayout
                   auth={auth}
                   properties={properties}
                   handleChange={handleChange}
+                  handleCredential={handleCredential}
                 />
               </div>
             ) : (
