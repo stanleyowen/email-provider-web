@@ -1,16 +1,9 @@
 import React, { useState } from "react";
-import {
-  Alert,
-  Slide,
-  Snackbar,
-  SlideProps,
-  TextField,
-  Grid2,
-  Button,
-} from "@mui/material";
-import { AuthInterface } from "../lib/interfaces.lib";
+import { Alert, Snackbar, SlideProps, TextField, Grid2 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import axios from "axios";
+
+import { AuthInterface } from "../lib/interfaces.lib";
 
 type TransitionProps = Omit<SlideProps, "direction">;
 
@@ -20,7 +13,7 @@ const Auth = ({ handleCredential }: AuthInterface) => {
     message: string | null;
   }>({
     isError: false,
-    message: "Invalid credentials",
+    message: "",
   });
 
   const [data, setData] = useState<{
@@ -28,25 +21,28 @@ const Auth = ({ handleCredential }: AuthInterface) => {
     password: string;
     incomingMailServer: string;
     outgoingMailServer: string;
+    startId: number;
   }>({
     email: "",
     password: "",
     incomingMailServer: "",
     outgoingMailServer: "",
+    startId: 1,
   });
 
   const [isLoading, setLoading] = useState<boolean>(false);
+
   const [transition, setTransition] = useState<
     React.ComponentType<TransitionProps> | undefined
   >(undefined);
 
+  // Handle the login data changes from the input fields
   const handleData = (key: string, value: string | number) => {
     setData({ ...data, [key]: value });
   };
 
-  const handleLogin = () => {
-    setLoading(true);
-
+  // Handle the login button click
+  const handleLogin = async () => {
     // Check if the required fields are filled
     if (
       data.email === "" ||
@@ -55,31 +51,41 @@ const Auth = ({ handleCredential }: AuthInterface) => {
       data.outgoingMailServer === ""
     ) {
       parseError("Make sure to fill all the required fields");
-      return;
     }
 
     // Check if the email is valid
     else if (!data.email.includes("@") || !data.email.includes(".")) {
       parseError("Invalid email address");
-      return;
     }
 
-    // Submit the data
+    // Make the POST request to the server
     else {
-      axios
+      await axios
         .post(`${process.env.REACT_APP_API_URL}/mail/`, data)
         .then((res) => {
-          console.log(res.data);
+          // Set the data to the local storage
+          localStorage.setItem("credentials", JSON.stringify(data));
+
+          handleCredential({
+            isLoading: false,
+            loggedIn: true,
+          });
+
+          // Redirect the user to the home page
+          // eslint-disable-next-line no-restricted-globals
+          // location.href = "/";
+
+          return;
         })
         .catch((err) => {
-          // parseError(err.message);
-          parseError(err.response.data.error);
+          parseError(err.response.data.error); // Display the error message
         });
     }
 
-    setLoading(false);
+    setLoading(false); // Set the loading state to false
   };
 
+  // Parse the error message and display it in the snackbar
   function parseError(errorMessage: string) {
     setLoading(false);
 
@@ -88,14 +94,15 @@ const Auth = ({ handleCredential }: AuthInterface) => {
       message: errorMessage,
     });
 
-    // setTimeout(
-    //   () =>
-    //     setStatus({
-    //       isError: false,
-    //       message: null,
-    //     }),
-    //   5000
-    // );
+    // Hide the snackbar after 5 seconds
+    setTimeout(
+      () =>
+        setStatus({
+          isError: false,
+          message: null,
+        }),
+      5000
+    );
   }
 
   return (
@@ -115,6 +122,7 @@ const Auth = ({ handleCredential }: AuthInterface) => {
           <br />
           Email Service Portal
         </h1>
+
         <Grid2 container spacing={3}>
           <Grid2 size={12}>
             <TextField
@@ -131,6 +139,7 @@ const Auth = ({ handleCredential }: AuthInterface) => {
           <Grid2 size={12}>
             <TextField
               label="Password"
+              type="password"
               variant="outlined"
               className="w-100"
               value={data.password}
@@ -168,7 +177,10 @@ const Auth = ({ handleCredential }: AuthInterface) => {
             <LoadingButton
               variant="outlined"
               loading={isLoading}
-              onClick={() => handleLogin()}
+              onClick={() => {
+                setLoading(true);
+                handleLogin();
+              }}
             >
               Login
             </LoadingButton>
