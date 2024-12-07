@@ -141,6 +141,8 @@ router.post("/send", async (req, res) => {
     password,
     outgoingMailServer: host,
     to,
+    cc,
+    bcc,
     subject,
     text,
   } = req.body;
@@ -156,7 +158,7 @@ router.post("/send", async (req, res) => {
 
   const transporter = nodemailer.createTransport({
     host: host,
-    port: 587,
+    port: 25,
     secure: false,
     auth: {
       user: email,
@@ -167,6 +169,8 @@ router.post("/send", async (req, res) => {
   const mailOptions = {
     from: email,
     to: to,
+    cc: cc || "",
+    bcc: bcc || "",
     subject: subject,
     text: text,
   };
