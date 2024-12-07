@@ -60,30 +60,54 @@ export default function App() {
   );
 
   useEffect(() => {
-    // Check if the user is not logged in and the credentials are stored in the local storage
-    if (
-      localStorage.getItem("credentials") &&
-      auth.isLoading &&
-      !auth.loggedIn
-    ) {
-      // Get the credentials from the local storage
-      const data = JSON.parse(localStorage.getItem("credentials")!);
+    console.log("App component mounted");
 
-      // Make the POST request to the server to validate the credentials
-      axios
-        .post(`${process.env.REACT_APP_API_URL}/mail/`, data)
-        .then((res) => {
-          setAuth({
-            isLoading: false,
-            loggedIn: true,
-            emails: res.data,
-          });
-        })
-        .catch((err) => {
-          setAuth((prevAuth) => ({ ...prevAuth, isLoading: false }));
-          console.error(err);
-        });
+    const data = localStorage.getItem("credentials");
+    if (data) {
+      // Get the credentials from the local storage
+      const parsedData = JSON.parse(data);
+
+      // Set loading to false and logged in to true immediately
+      setAuth((prevAuth) => ({
+        ...prevAuth,
+        isLoading: false,
+        loggedIn: true,
+      }));
+
+      // Recursive function to fetch messages
+      const fetchMessages = async (startId = 0) => {
+        try {
+          const response = await axios.post(
+            `${process.env.REACT_APP_API_URL}/mail/`,
+            {
+              ...parsedData,
+              startId,
+            }
+          );
+
+          if (response.status === 200) {
+            setAuth((prevAuth) => ({
+              ...prevAuth,
+              emails: [...prevAuth.emails, ...response.data],
+            }));
+            // Fetch the next batch of messages
+            fetchMessages(startId + 50);
+          }
+        } catch (err: any) {
+          if (err.response && err.response.status === 404) {
+            // Stop fetching when a 404 status code is received
+            setAuth((prevAuth) => ({ ...prevAuth, isLoading: false }));
+          } else {
+            console.error(err);
+            setAuth((prevAuth) => ({ ...prevAuth, isLoading: false }));
+          }
+        }
+      };
+
+      // Start fetching messages
+      fetchMessages();
     } else {
+      // Set the loading state to false if no credentials are found
       setAuth((prevAuth) => ({ ...prevAuth, isLoading: false }));
     }
   }, []);
