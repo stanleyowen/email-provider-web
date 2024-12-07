@@ -77,7 +77,11 @@ export default function App() {
           .catch((err: any) => {
             if (err.response && err.response.status === 404) {
               // Stop fetching when a 404 status code is received
-              setAuth((prevAuth) => ({ ...prevAuth, isLoading: false }));
+              setAuth((prevAuth) => ({
+                ...prevAuth,
+                isLoading: false,
+                emails: prevAuth.emails.sort((a, b) => b.seqno - a.seqno),
+              }));
             } else {
               console.error(err);
               setAuth((prevAuth) => ({ ...prevAuth, isLoading: false }));

@@ -189,4 +189,67 @@ router.post("/send", async (req, res) => {
   });
 });
 
+router.delete("/", async (req, res) => {
+  const { email, password, incomingMailServer: host, seqno } = req.body;
+
+  const imap = new Imap({
+    user: email,
+    password: password,
+    host: host,
+    tls: false,
+  });
+
+  function openInbox(cb) {
+    imap.openBox("INBOX", false, cb);
+  }
+
+  imap.once("ready", function () {
+    openInbox(function (err, box) {
+      if (err) {
+        console.log("Failed to open inbox: " + err);
+        return res.status(500).json({
+          code: 500,
+          error: "Failed to open inbox",
+        });
+      }
+
+      imap.seq.addFlags(seqno, "\\Deleted", function (err) {
+        if (err) {
+          console.log("Failed to mark email for deletion: " + err);
+          return res.status(500).json({
+            code: 500,
+            error: "Failed to mark email for deletion",
+          });
+        }
+
+        imap.expunge(function (err) {
+          if (err) {
+            console.log("Failed to expunge mailbox: " + err);
+            return res.status(500).json({
+              code: 500,
+              error: "Failed to expunge mailbox",
+            });
+          }
+
+          console.log("Email deleted successfully.");
+          res.send(
+            JSON.stringify({ message: "Email deleted successfully." }, null, 2)
+          );
+          imap.end();
+        });
+      });
+    });
+  });
+
+  imap.once("error", function (err) {
+    console.log(err);
+    return res.status(500).json({
+      code: 500,
+      error: "Failed to connect to IMAP server",
+    });
+  });
+
+  imap.connect();
+});
+
 module.exports = router;

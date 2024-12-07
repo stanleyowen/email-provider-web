@@ -17,9 +17,13 @@ const Home = ({ auth }: any) => {
     else setGreeting("Evening");
   }, []);
 
-  const switchMode = (target: number) => {
+  const switchMode = (target: number | string) => {
     setViewMode(target);
-    setSelectedEmail(auth.emails.find((email: any) => email.seqno === target));
+
+    if (target !== "list")
+      setSelectedEmail(
+        auth.emails.find((email: any) => email.seqno === target)
+      );
   };
 
   const handleNextPage = () => {
@@ -65,6 +69,8 @@ const Home = ({ auth }: any) => {
                 </div>
               </Tooltip>
             </div>
+            Page {currentPage} of{" "}
+            {Math.ceil(auth.emails.length / emailsPerPage)}
           </div>
 
           <div className="emails mt-10">
@@ -91,6 +97,13 @@ const Home = ({ auth }: any) => {
           <div className="email p-10">
             {selectedEmail ? (
               <>
+                <button
+                  className="card p-10 mb-10"
+                  style={{ textAlign: "left", width: "auto" }}
+                  onClick={() => switchMode("list")}
+                >
+                  Back
+                </button>
                 <pre>
                   From &nbsp;&nbsp;&nbsp;: {selectedEmail.from}
                   <br />
