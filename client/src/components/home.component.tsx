@@ -39,6 +39,24 @@ const Home = ({ auth, refreshInbox }: any) => {
   const indexOfFirstEmail = indexOfLastEmail - emailsPerPage;
   const currentEmails = auth.emails.slice(indexOfFirstEmail, indexOfLastEmail);
 
+  const deleteEmail = async (seqno: number) => {
+    const credentials = JSON.parse(localStorage.getItem("credentials") || "{}");
+
+    await axios
+      .delete(`${process.env.REACT_APP_API_URL}/mail`, {
+        data: { ...credentials, seqno },
+      })
+      .then((response) => {
+        const newEmails = auth.emails.filter(
+          (email: any) => email.seqno !== seqno
+        );
+
+        auth.emails = newEmails;
+        setSelectedEmail(null);
+        setViewMode("list");
+      });
+  };
+
   return (
     <div className="m-10">
       {viewMode === "list" ? (
@@ -113,10 +131,21 @@ const Home = ({ auth, refreshInbox }: any) => {
               <>
                 <button
                   className="card p-10 mb-10"
-                  style={{ textAlign: "left", width: "auto" }}
+                  style={{
+                    textAlign: "left",
+                    width: "auto",
+                    marginRight: "10px",
+                  }}
                   onClick={() => switchMode("list")}
                 >
                   Back
+                </button>
+                <button
+                  className="card p-10 mb-10"
+                  style={{ textAlign: "left", width: "auto" }}
+                  onClick={() => deleteEmail(selectedEmail.seqno)}
+                >
+                  Delete
                 </button>
                 <pre>
                   From &nbsp;&nbsp;&nbsp;: {selectedEmail.from}
