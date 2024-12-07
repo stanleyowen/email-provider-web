@@ -1,4 +1,6 @@
+import { IconButton, TextField } from "@mui/material";
 import React, { useState } from "react";
+import { Close } from "../lib/icons.component";
 
 const SearchComponent = ({ auth }: any) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -6,7 +8,7 @@ const SearchComponent = ({ auth }: any) => {
   const [selectedEmail, setSelectedEmail] = useState<any>(null);
 
   const handleSearch = (query: string) => {
-    setSearchQuery(query.toLowerCase());
+    setSearchQuery(query);
 
     const filtered = auth.emails?.filter((email: any) => {
       const from = email.from ? email.from.toLowerCase() : "";
@@ -14,7 +16,9 @@ const SearchComponent = ({ auth }: any) => {
       const body = email.body ? email.body.toLowerCase() : "";
 
       return (
-        from.includes(query) || subject.includes(query) || body.includes(query)
+        from.includes(query.toLowerCase()) ||
+        subject.includes(query.toLowerCase()) ||
+        body.includes(query.toLowerCase())
       );
     });
 
@@ -26,14 +30,36 @@ const SearchComponent = ({ auth }: any) => {
     setSelectedEmail(email);
   };
 
+  const ClearQuery = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setSearchQuery("");
+    document.getElementById("search-query")?.focus();
+  };
+
   return (
     <div className="search-component">
-      <input
-        type="text"
-        placeholder="Search emails..."
-        value={searchQuery}
-        onChange={(e) => handleSearch(e.target.value)}
-      />
+      <div className="m-10">
+        <div className="flex">
+          <TextField
+            label="Search Emails"
+            variant="outlined"
+            className="search"
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+            id="search-query"
+            autoFocus
+            autoComplete="off"
+          />
+          <IconButton
+            className={(searchQuery ? null : "none") + " p-10 close-btn"}
+            onClick={ClearQuery}
+            size="large"
+          >
+            {Close()}
+          </IconButton>
+        </div>
+      </div>
+
       <div className="emails mt-10">
         {filteredEmails && filteredEmails.length > 0 ? (
           filteredEmails.map((email: any, index: number) => (
