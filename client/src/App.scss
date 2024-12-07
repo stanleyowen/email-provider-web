@@ -153,6 +153,19 @@ p {
     background: rgb(var(--white) / 40%);
 }
 
+/* Email Menu */
+.email-menu {
+    width: 100%;
+    height: 55px;
+    padding: 15px;
+    display: flex;
+    box-sizing: border-box;
+}
+
+.navbar div.mrl-10:last-child {
+    margin-left: auto;
+}
+
 /* Sidebar */
 .sidebar {
     width: 225px;

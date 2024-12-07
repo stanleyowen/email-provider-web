@@ -41,7 +41,6 @@ const App = ({ auth, properties, handleChange, handleCredential }: any) => {
         <BaseLayout
           auth={auth}
           properties={properties}
-          HOST_DOMAIN={HOST_DOMAIN}
           handleChange={handleChange}
           handleCredential={handleCredential}
         />
