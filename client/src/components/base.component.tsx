@@ -1,6 +1,6 @@
 import React from "react";
 
-import Logs from "./logs.component";
+import Search from "./search.component";
 import Path from "./logs-path.component";
 import Home from "./home.component";
 import Settings from "./settings.component";
@@ -18,8 +18,8 @@ const BaseLayout = ({
     <div className="base">
       {properties.activeTab === "home" ? (
         <Home auth={auth} />
-      ) : properties.activeTab === "logs" ? (
-        <Logs properties={properties} HOST_DOMAIN={HOST_DOMAIN} />
+      ) : properties.activeTab === "search" ? (
+        <Search auth={auth} properties={properties} HOST_DOMAIN={HOST_DOMAIN} />
       ) : properties.activeTab === "path" ? (
         <Path properties={properties} HOST_DOMAIN={HOST_DOMAIN} />
       ) : properties.activeTab === "environment" ? (

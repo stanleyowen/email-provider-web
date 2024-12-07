@@ -1,14 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { Button, Tooltip } from "@mui/material";
 import {
-  Button,
-  Dialog,
-  Tooltip,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-} from "@mui/material";
-import {
-  Beta,
   Download,
   HomeSolid,
   HomeOutline,
@@ -20,12 +12,12 @@ import {
   LogsOutline as PathOutline,
   License as EnvironmentSolid,
   License as EnvironmentOutline,
+  SearchSolid,
+  SearchOutline,
 } from "../lib/icons.component";
 
 // eslint-disable-next-line
 const SideBar = ({ handleChange, properties }: any) => {
-  const [isOpen, setDialog] = useState<boolean>(false);
-
   useEffect(() => {
     document
       .getElementById("tabs")
@@ -45,7 +37,7 @@ const SideBar = ({ handleChange, properties }: any) => {
   return (
     <div className="sidebar">
       <div id="tabs">
-        {["Home", "Path", "Logs", "Environment", "Settings"].map(
+        {["Home", "Search", "Logs", "Environment", "Settings"].map(
           (tab, index) => {
             const components: { [key: string]: any } = {
               Download,
@@ -55,8 +47,8 @@ const SideBar = ({ handleChange, properties }: any) => {
               SettingsOutline,
               LogsSolid,
               LogsOutline,
-              PathSolid,
-              PathOutline,
+              SearchSolid,
+              SearchOutline,
               EnvironmentSolid,
               EnvironmentOutline,
             };

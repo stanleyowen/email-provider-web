@@ -18,7 +18,7 @@ import {
 import React, { useState, useEffect } from "react";
 import { Close } from "../lib/icons.component";
 
-const Music = ({ properties }: any) => {
+const Search = ({ properties }: any) => {
   const [logs, setLogData] = useState<any>([]);
   const [status, setStatus] = useState<{
     isLoading: boolean;
@@ -164,4 +164,4 @@ const Music = ({ properties }: any) => {
   );
 };
 
-export default Music;
+export default Search;
