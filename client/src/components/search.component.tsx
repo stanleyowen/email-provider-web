@@ -37,27 +37,25 @@ const SearchComponent = ({ auth }: any) => {
   };
 
   return (
-    <div className="search-component">
-      <div className="m-10">
-        <div className="flex">
-          <TextField
-            label="Search Emails"
-            variant="outlined"
-            className="search"
-            value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
-            id="search-query"
-            autoFocus
-            autoComplete="off"
-          />
-          <IconButton
-            className={(searchQuery ? null : "none") + " p-10 close-btn"}
-            onClick={ClearQuery}
-            size="large"
-          >
-            {Close()}
-          </IconButton>
-        </div>
+    <div className="search-component" style={{ padding: "20px" }}>
+      <div className="flex">
+        <TextField
+          label="Search Emails"
+          variant="outlined"
+          className="search"
+          value={searchQuery}
+          onChange={(e) => handleSearch(e.target.value)}
+          id="search-query"
+          autoFocus
+          autoComplete="off"
+        />
+        <IconButton
+          className={(searchQuery ? null : "none") + " p-10 close-btn"}
+          onClick={ClearQuery}
+          size="large"
+        >
+          {Close()}
+        </IconButton>
       </div>
 
       <div className="emails mt-10">
@@ -74,8 +72,10 @@ const SearchComponent = ({ auth }: any) => {
               <p>Date: {new Date(email.date).toDateString()}</p>
             </div>
           ))
+        ) : searchQuery === "" ? (
+          <p></p>
         ) : (
-          <p>No emails to display</p>
+          <p>No emails found. Try searching for something else.</p>
         )}
       </div>
       {selectedEmail && (

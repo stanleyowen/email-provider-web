@@ -99,9 +99,6 @@ const ComposeEmail = ({ auth, handleCredential }: AuthInterface) => {
 
   // Parse the error message and display it in the snackbar
   function parseError(errorMessage: string, success?: boolean) {
-    setLoading(false);
-
-    console.log(errorMessage, success);
     setStatus({
       isSuccess: success || false,
       isError: !success || false,
