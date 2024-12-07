@@ -1,167 +1,72 @@
-import {
-  Alert,
-  Button,
-  Table,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  TablePagination,
-  LinearProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  TextField,
-  DialogActions,
-} from "@mui/material";
-import React, { useState, useEffect } from "react";
-import { Close } from "../lib/icons.component";
+import React, { useState } from "react";
 
-const Search = ({ properties }: any) => {
-  const [logs, setLogData] = useState<any>([]);
-  const [status, setStatus] = useState<{
-    isLoading: boolean;
-    isError: boolean;
-  }>({
-    isLoading: false,
-    isError: false,
-  });
-  const [page, setPage] = useState<number>(0);
-  const [rowPerPage, setRowPerPage] = useState<number>(10);
-  const [dialogIsOpen, setDialogIsOpen] = useState<boolean>(false);
+const SearchComponent = ({ auth }: any) => {
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [filteredEmails, setFilteredEmails] = useState<any[]>([]);
+  const [selectedEmail, setSelectedEmail] = useState<any>(null);
 
-  useEffect(() => {}, []);
+  const handleSearch = (query: string) => {
+    setSearchQuery(query.toLowerCase());
 
-  // const DeleteMusic = () => {
-  //     setMusicDialogIsOpen(false);
-  //     const id = musicData.properties.id + page * rowPerPage;
-  //     remove(ref(getFirestore(), 'logs/' + id));
-  // };
+    const filtered = auth.emails?.filter((email: any) => {
+      const from = email.from ? email.from.toLowerCase() : "";
+      const subject = email.subject ? email.subject.toLowerCase() : "";
+      const body = email.body ? email.body.toLowerCase() : "";
 
-  const columns = [
-    {
-      id: "error",
-      label: "Error",
-      minWidth: 170,
-    },
-    {
-      id: "message",
-      label: "Description",
-      minWidth: 100,
-    },
-    {
-      id: "timestamp",
-      label: "Timestamp",
-      minWidth: 100,
-    },
-    {
-      id: "delete",
-      label: "",
-      width: "auto",
-    },
-  ];
+      return (
+        from.includes(query) || subject.includes(query) || body.includes(query)
+      );
+    });
+
+    setFilteredEmails(filtered);
+    setSelectedEmail(null); // Reset selected email when search query changes
+  };
+
+  const handleEmailClick = (email: any) => {
+    setSelectedEmail(email);
+  };
 
   return (
-    <div className="m-10">
-      <TableContainer>
-        <Table className="card">
-          <TableHead>
-            <TableRow>
-              {columns.map((column) => (
-                <TableCell
-                  key={column.id}
-                  align="left"
-                  style={{ minWidth: column.minWidth }}
-                >
-                  {column.label}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {logs && logs?.length > 0 ? (
-              logs
-                .slice(page * rowPerPage, page * rowPerPage + rowPerPage)
-                .map((song: any, index: number) => {
-                  return (
-                    <TableRow hover key={index}>
-                      {columns.map((column) => {
-                        return (
-                          <TableCell key={column.id}>
-                            {column.id === "timestamp" ? (
-                              new Date(
-                                song.timestamp.seconds * 1000
-                              ).toLocaleDateString("en-US", {
-                                weekday: "short",
-                                day: "numeric",
-                                year: "numeric",
-                                month: "long",
-                                hour: "numeric",
-                                minute: "numeric",
-                                second: "numeric",
-                              })
-                            ) : column.id === "delete" ? (
-                              <Button
-                                onClick={() => setDialogIsOpen(true)}
-                                variant="outlined"
-                              >
-                                <Close />
-                              </Button>
-                            ) : (
-                              song[column.id]
-                            )}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  );
-                })
-            ) : (
-              <TableRow>
-                <TableCell colSpan={3}>
-                  <LinearProgress />
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      <TablePagination
-        className="card"
-        component="div"
-        count={logs.length ?? 0}
-        rowsPerPage={rowPerPage}
-        page={page}
-        onPageChange={(_, newPage) => {
-          setPage(newPage);
-        }}
-        onRowsPerPageChange={(e) => {
-          setPage(0);
-          setRowPerPage(+e.target.value);
-        }}
+    <div className="search-component">
+      <input
+        type="text"
+        placeholder="Search emails..."
+        value={searchQuery}
+        onChange={(e) => handleSearch(e.target.value)}
       />
-
-      <Dialog
-        fullWidth
-        open={dialogIsOpen}
-        onClose={() => setDialogIsOpen(false)}
-      >
-        <DialogTitle className="error">Delete Log Permanently</DialogTitle>
-        <DialogContent>
-          Are you sure want to delete this invoice permanently? This action is{" "}
-          <span className="error">irreversible</span>.
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogIsOpen(false)}>Cancel</Button>
-          <Button color="error" onClick={() => console.log("hi")}>
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <div className="emails mt-10">
+        {filteredEmails && filteredEmails.length > 0 ? (
+          filteredEmails.map((email: any, index: number) => (
+            <div
+              key={index}
+              className="card p-10 mb-10"
+              style={{ textAlign: "left", cursor: "pointer" }}
+              onClick={() => handleEmailClick(email)}
+            >
+              <h3>From: {email.from}</h3>
+              <p>Subject: {email.subject}</p>
+              <p>Date: {new Date(email.date).toDateString()}</p>
+            </div>
+          ))
+        ) : (
+          <p>No emails to display</p>
+        )}
+      </div>
+      {selectedEmail && (
+        <div className="email-details p-10 mt-10">
+          <pre>
+            From &nbsp;&nbsp;&nbsp;: {selectedEmail.from}
+            <br />
+            Subject : {selectedEmail.subject}
+            <br />
+            Date &nbsp;&nbsp;&nbsp;:{" "}
+            {new Date(selectedEmail.date).toDateString()}
+          </pre>
+          <div dangerouslySetInnerHTML={{ __html: selectedEmail.body }}></div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default Search;
+export default SearchComponent;

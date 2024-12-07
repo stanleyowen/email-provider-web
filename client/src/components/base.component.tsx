@@ -19,7 +19,7 @@ const BaseLayout = ({
       {properties.activeTab === "home" ? (
         <Home auth={auth} />
       ) : properties.activeTab === "search" ? (
-        <Search auth={auth} properties={properties} HOST_DOMAIN={HOST_DOMAIN} />
+        <Search auth={auth} />
       ) : properties.activeTab === "path" ? (
         <Path properties={properties} HOST_DOMAIN={HOST_DOMAIN} />
       ) : properties.activeTab === "environment" ? (
