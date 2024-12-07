@@ -14,9 +14,7 @@ process.env.NODE_ENV === "production"
 // eslint-disable-next-line
 export default function App() {
   const [properties, setProperties] = useState<any>({
-    action: 0,
     activeTab: window.localStorage.getItem("tab-session") ?? "home",
-    history: [window.localStorage.getItem("tab-session") ?? "home"],
   });
 
   const [auth, setAuth] = useState<{
@@ -36,32 +34,17 @@ export default function App() {
 
   const handleChange = useCallback(
     (a: any) => {
-      if (a.goForward || a.goBackward)
-        setProperties({
-          ...properties,
-          action: a.goBackward ? properties.action - 1 : properties.action + 1,
-          [a.id]: a.value,
-        });
-      else {
-        properties.history.splice(
-          properties.action + 1,
-          properties.history.length - (properties.action + 1),
-          a.value
-        );
-        setProperties({
-          ...properties,
-          action: properties.action + 1,
-          [a.id]: a.value,
-        });
-      }
+      setProperties({
+        ...properties,
+        [a.id]: a.value,
+      });
+
       window.localStorage.setItem("tab-session", a.value);
     },
     [properties]
   );
 
   useEffect(() => {
-    console.log("App component mounted");
-
     const data = localStorage.getItem("credentials");
     if (data) {
       // Get the credentials from the local storage

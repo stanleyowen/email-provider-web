@@ -17,13 +17,7 @@ const BaseLayout = ({
   return (
     <div className="base">
       {properties.activeTab === "home" ? (
-        <Home
-          auth={auth}
-          properties={properties}
-          HOST_DOMAIN={HOST_DOMAIN}
-          handleChange={handleChange}
-          handleCredential={handleCredential}
-        />
+        <Home auth={auth} />
       ) : properties.activeTab === "logs" ? (
         <Logs properties={properties} HOST_DOMAIN={HOST_DOMAIN} />
       ) : properties.activeTab === "path" ? (

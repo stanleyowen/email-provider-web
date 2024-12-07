@@ -3,13 +3,7 @@ import { License, MusicOutline, SettingsOutline } from "../lib/icons.component";
 import { Tooltip, IconButton } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "../lib/icons.component";
 
-const Home = ({
-  auth,
-  properties,
-  HOST_DOMAIN,
-  handleChange,
-  handleCredential,
-}: any) => {
+const Home = ({ auth }: any) => {
   const [greeting, setGreeting] = useState<string>();
   const [viewMode, setViewMode] = useState<string | number>("list");
   const [selectedEmail, setSelectedEmail] = useState<any>(null);

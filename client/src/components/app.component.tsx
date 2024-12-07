@@ -36,12 +36,7 @@ const App = ({ auth, properties, handleChange, handleCredential }: any) => {
     <div>
       {auth.isLoading ? <LinearProgress /> : null}
       <div className="app" style={auth.isLoading ? { height: "99.3vh" } : {}}>
-        <Navbar
-          auth={auth}
-          properties={properties}
-          handleChange={handleChange}
-          handleCredential={handleCredential}
-        />
+        <Navbar handleCredential={handleCredential} />
 
         <BaseLayout
           auth={auth}
