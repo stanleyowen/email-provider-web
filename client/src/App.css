@@ -8,7 +8,9 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
 }
@@ -72,7 +74,8 @@ p {
 }
 
 .backdrop-image {
-  background: url("https://user-images.githubusercontent.com/69080584/135237771-30c727d6-e88f-48e1-a65c-4fcef9e91113.png") center/cover no-repeat;
+  background: url("https://user-images.githubusercontent.com/69080584/135237771-30c727d6-e88f-48e1-a65c-4fcef9e91113.png")
+    center/cover no-repeat;
   -webkit-filter: blur(15px);
   filter: blur(15px);
   -webkit-transform: scale(1.1);
@@ -93,9 +96,32 @@ p {
   height: 100%;
   position: absolute;
   background-blend-mode: normal, color, luminosity;
-  background: linear-gradient(0deg, rgba(239, 239, 239, 0.3), rgba(239, 239, 239, 0.3)), rgba(239, 239, 239, 0.95) url("https://user-images.githubusercontent.com/69080584/135238252-5fd29825-32dc-4035-bd75-98eabc473ac4.png") center/196px repeat;
-  background: -o-linear-gradient(bottom, rgba(239, 239, 239, 0.3), rgba(239, 239, 239, 0.3)), rgba(239, 239, 239, 0.95) url("https://user-images.githubusercontent.com/69080584/135238252-5fd29825-32dc-4035-bd75-98eabc473ac4.png") center/196px repeat;
-  background: -webkit-gradient(linear, left bottom, left top, from(rgba(239, 239, 239, 0.3)), to(rgba(239, 239, 239, 0.3))), rgba(239, 239, 239, 0.95) url("https://user-images.githubusercontent.com/69080584/135238252-5fd29825-32dc-4035-bd75-98eabc473ac4.png") center/196px repeat;
+  background: linear-gradient(
+      0deg,
+      rgba(239, 239, 239, 0.3),
+      rgba(239, 239, 239, 0.3)
+    ),
+    rgba(239, 239, 239, 0.95)
+      url("https://user-images.githubusercontent.com/69080584/135238252-5fd29825-32dc-4035-bd75-98eabc473ac4.png")
+      center/196px repeat;
+  background: -o-linear-gradient(
+      bottom,
+      rgba(239, 239, 239, 0.3),
+      rgba(239, 239, 239, 0.3)
+    ),
+    rgba(239, 239, 239, 0.95)
+      url("https://user-images.githubusercontent.com/69080584/135238252-5fd29825-32dc-4035-bd75-98eabc473ac4.png")
+      center/196px repeat;
+  background: -webkit-gradient(
+      linear,
+      left bottom,
+      left top,
+      from(rgba(239, 239, 239, 0.3)),
+      to(rgba(239, 239, 239, 0.3))
+    ),
+    rgba(239, 239, 239, 0.95)
+      url("https://user-images.githubusercontent.com/69080584/135238252-5fd29825-32dc-4035-bd75-98eabc473ac4.png")
+      center/196px repeat;
 }
 
 /* Auth */
@@ -110,7 +136,7 @@ p {
 }
 
 .bg-white {
-  background: rgb(var(--white)/40%);
+  background: rgb(var(--white) / 40%);
 }
 
 /* Auth */
@@ -125,7 +151,7 @@ p {
 }
 
 .bg-white {
-  background: rgb(var(--white)/40%);
+  background: rgb(var(--white) / 40%);
 }
 
 /* Email Menu */
@@ -137,7 +163,7 @@ p {
   box-sizing: border-box;
 }
 
-.navbar div.mrl-10:last-child {
+.email-menu div.mrl-10:last-child {
   margin-left: auto;
 }
 
@@ -149,7 +175,7 @@ p {
   position: fixed;
   padding-top: 30px;
   box-sizing: border-box;
-  background: rgb(var(--white)/40%);
+  background: rgb(var(--white) / 40%);
 }
 
 #tabs {
@@ -159,7 +185,7 @@ p {
 }
 
 #tabs .active {
-  background: rgb(var(--blue)/15%);
+  background: rgb(var(--blue) / 15%);
 }
 
 .tab:not(#settings).active svg,
@@ -182,7 +208,7 @@ p {
 
 .tab {
   font-weight: 525;
-  color: rgb(var(--black)/70%) !important;
+  color: rgb(var(--black) / 70%) !important;
 }
 
 .tab:hover,
@@ -197,7 +223,7 @@ p {
   padding: 15px;
   display: flex;
   box-sizing: border-box;
-  background-color: rgb(var(--white)/50%);
+  background-color: rgb(var(--white) / 50%);
 }
 
 .navbar div.mrl-10:last-child {
@@ -233,8 +259,8 @@ button {
   border-radius: 5px !important;
   transition: all 0.3s !important;
   box-sizing: border-box !important;
-  background-color: rgb(var(--white)/20%) !important;
-  box-shadow: 0px 4px 8px rgb(var(--black)/5%) !important;
+  background-color: rgb(var(--white) / 20%) !important;
+  box-shadow: 0px 4px 8px rgb(var(--black) / 5%) !important;
 }
 
 .large-card {
@@ -245,22 +271,22 @@ button {
   flex-wrap: nowrap !important;
   transition: all 0.3s !important;
   box-sizing: border-box !important;
-  background-color: rgb(var(--white)/20%) !important;
-  box-shadow: 0px 4px 8px rgb(var(--black)/5%) !important;
+  background-color: rgb(var(--white) / 20%) !important;
+  box-shadow: 0px 4px 8px rgb(var(--black) / 5%) !important;
 }
 
 .card:hover {
-  background-color: rgb(var(--white)/50%) !important;
+  background-color: rgb(var(--white) / 50%) !important;
 }
 
 .large-card:hover {
-  background-color: rgb(var(--white)/50%) !important;
+  background-color: rgb(var(--white) / 50%) !important;
 }
 
 .card img {
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
-  box-shadow: 2px 0 10px rgb(var(--black)/20%);
+  box-shadow: 2px 0 10px rgb(var(--black) / 20%);
 }
 
 .card p,
@@ -590,7 +616,7 @@ button {
 .footer {
   padding: 10px 15px;
   overflow: auto;
-  background: rgb(var(--white)/60%);
+  background: rgb(var(--white) / 60%);
   color: rgb(var(--black));
 }
 
@@ -631,7 +657,7 @@ button {
 }
 
 #settings .active {
-  background-color: rgb(var(--blue)/35%);
+  background-color: rgb(var(--blue) / 35%);
 }
 
 #settings svg {
@@ -665,7 +691,7 @@ button {
   display: block;
   margin: 10px auto;
   transition: 0.3s all;
-  color: rgb(var(--black)/70%);
+  color: rgb(var(--black) / 70%);
 }
 
 #download .large-card:hover svg {
@@ -688,7 +714,7 @@ button {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgb(var(--black)/75%);
+  background: rgb(var(--black) / 75%);
   border-radius: 7px;
   /* border-radius: calc(15px / 2); */
   background-clip: content-box;

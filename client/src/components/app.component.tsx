@@ -13,7 +13,13 @@ import BaseLayout from "./base.component";
 type TransitionProps = Omit<SlideProps, "direction">;
 
 // eslint-disable-next-line
-const App = ({ auth, properties, handleChange, handleCredential }: any) => {
+const App = ({
+  auth,
+  properties,
+  handleChange,
+  handleCredential,
+  refreshInbox,
+}: any) => {
   const HOST_DOMAIN: string =
     process.env.REACT_APP_HOST_DOMAIN ?? window.location.origin;
   const [isOffline, setConnectionState] = useState<boolean>(false);
@@ -43,6 +49,7 @@ const App = ({ auth, properties, handleChange, handleCredential }: any) => {
           properties={properties}
           handleChange={handleChange}
           handleCredential={handleCredential}
+          refreshInbox={refreshInbox}
         />
 
         <Snackbar open={isOffline} TransitionComponent={transition}>

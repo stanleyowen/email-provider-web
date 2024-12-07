@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { License, MusicOutline, SettingsOutline } from "../lib/icons.component";
+import { Refresh } from "../lib/icons.component";
+import axios from "axios";
 import { Tooltip, IconButton } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "../lib/icons.component";
 
-const Home = ({ auth }: any) => {
+const Home = ({ auth, refreshInbox }: any) => {
   const [greeting, setGreeting] = useState<string>();
   const [viewMode, setViewMode] = useState<string | number>("list");
   const [selectedEmail, setSelectedEmail] = useState<any>(null);
@@ -45,6 +46,19 @@ const Home = ({ auth }: any) => {
           <h2>Good {greeting}</h2>
 
           <div className="email-menu">
+            <div className="m-10-auto">
+              <Tooltip
+                title="Refresh Inbox"
+                enterDelay={500}
+                enterNextDelay={500}
+              >
+                <div>
+                  <IconButton onClick={refreshInbox} disabled={auth.isLoading}>
+                    <Refresh />
+                  </IconButton>
+                </div>
+              </Tooltip>
+            </div>
             <div className="m-10-auto">
               <Tooltip title="Go Back" enterDelay={500} enterNextDelay={500}>
                 <div>

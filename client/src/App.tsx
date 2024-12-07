@@ -44,50 +44,60 @@ export default function App() {
     [properties]
   );
 
-  useEffect(() => {
+  // Recursive function to fetch messages
+  const fetchMessages = async (startId = 0) => {
     const data = localStorage.getItem("credentials");
     if (data) {
-      // Get the credentials from the local storage
       const parsedData = JSON.parse(data);
-
-      // Recursive function to fetch messages
-      const fetchMessages = async (startId = 0) => {
-        await axios
-          .post(`${process.env.REACT_APP_API_URL}/mail/`, {
-            ...parsedData,
-            startId,
-          })
-          .then((response) => {
-            // Set loading to false and logged in to true immediately
+      await axios
+        .post(`${process.env.REACT_APP_API_URL}/mail/`, {
+          ...parsedData,
+          startId,
+        })
+        .then((response) => {
+          if (response.status === 200) {
+            setAuth((prevAuth) => ({
+              ...prevAuth,
+              emails: [...prevAuth.emails, ...response.data],
+            }));
+            // Fetch the next batch of messages
+            fetchMessages(startId + 50);
+          }
+        })
+        .catch((err: any) => {
+          if (err.response && err.response.status === 404) {
+            // Stop fetching when a 404 status code is received
             setAuth((prevAuth) => ({
               ...prevAuth,
               isLoading: false,
-              loggedIn: true,
+              emails: prevAuth.emails.sort((a, b) => b.seqno - a.seqno),
             }));
+          } else {
+            console.error(err);
+            setAuth((prevAuth) => ({ ...prevAuth, isLoading: false }));
+          }
+        });
+    }
+  };
 
-            if (response.status === 200) {
-              setAuth((prevAuth) => ({
-                ...prevAuth,
-                emails: [...prevAuth.emails, ...response.data],
-              }));
-              // Fetch the next batch of messages
-              fetchMessages(startId + 50);
-            }
-          })
-          .catch((err: any) => {
-            if (err.response && err.response.status === 404) {
-              // Stop fetching when a 404 status code is received
-              setAuth((prevAuth) => ({
-                ...prevAuth,
-                isLoading: false,
-                emails: prevAuth.emails.sort((a, b) => b.seqno - a.seqno),
-              }));
-            } else {
-              console.error(err);
-              setAuth((prevAuth) => ({ ...prevAuth, isLoading: false }));
-            }
-          });
-      };
+  const refreshInbox = () => {
+    setAuth((prevAuth) => ({
+      ...prevAuth,
+      emails: [],
+      isLoading: true,
+    }));
+    fetchMessages();
+  };
+
+  useEffect(() => {
+    const data = localStorage.getItem("credentials");
+    if (data) {
+      // Set loading to false and logged in to true immediately
+      setAuth((prevAuth) => ({
+        ...prevAuth,
+        isLoading: false,
+        loggedIn: true,
+      }));
 
       // Start fetching messages
       fetchMessages();
@@ -127,6 +137,7 @@ export default function App() {
                   properties={properties}
                   handleChange={handleChange}
                   handleCredential={handleCredential}
+                  refreshInbox={refreshInbox}
                 />
               </div>
             ) : (
