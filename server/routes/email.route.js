@@ -40,6 +40,8 @@ router.post("/", async (req, res) => {
       }
 
       const messages = [];
+      let fetchError = false;
+
       const f = imap.seq.fetch(startId + ":" + (startId + 50), {
         bodies: "",
         struct: true,
@@ -47,6 +49,7 @@ router.post("/", async (req, res) => {
 
       f.on("message", function (msg, seqno) {
         const message = { seqno, headers: {}, body: "", attributes: null };
+
         msg.on("body", function (stream, info) {
           let buffer = "";
           stream.on("data", function (chunk) {
@@ -73,6 +76,7 @@ router.post("/", async (req, res) => {
             }
           });
         });
+
         msg.once("attributes", function (attrs) {
           message.attributes = attrs;
         });
@@ -84,13 +88,20 @@ router.post("/", async (req, res) => {
 
       f.once("error", function (err) {
         console.log("Fetch error: " + err);
-        return res.status(500).json({
-          code: 500,
+
+        fetchError = true;
+
+        return res.status(404).json({
+          code: 404,
           error: "Failed to fetch messages",
         });
       });
 
       f.once("end", function () {
+        if (fetchError) {
+          return;
+        }
+
         console.log("Done fetching all messages!");
         imap.end();
 
@@ -108,7 +119,7 @@ router.post("/", async (req, res) => {
           };
         });
 
-        res.send(JSON.stringify(beautifiedMessages, null, 2));
+        return res.send(JSON.stringify(beautifiedMessages, null, 2));
       });
     });
   });
