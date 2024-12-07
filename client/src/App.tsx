@@ -67,41 +67,39 @@ export default function App() {
       // Get the credentials from the local storage
       const parsedData = JSON.parse(data);
 
-      // Set loading to false and logged in to true immediately
-      setAuth((prevAuth) => ({
-        ...prevAuth,
-        isLoading: false,
-        loggedIn: true,
-      }));
-
       // Recursive function to fetch messages
       const fetchMessages = async (startId = 0) => {
-        try {
-          const response = await axios.post(
-            `${process.env.REACT_APP_API_URL}/mail/`,
-            {
-              ...parsedData,
-              startId,
-            }
-          );
-
-          if (response.status === 200) {
+        await axios
+          .post(`${process.env.REACT_APP_API_URL}/mail/`, {
+            ...parsedData,
+            startId,
+          })
+          .then((response) => {
+            // Set loading to false and logged in to true immediately
             setAuth((prevAuth) => ({
               ...prevAuth,
-              emails: [...prevAuth.emails, ...response.data],
+              isLoading: false,
+              loggedIn: true,
             }));
-            // Fetch the next batch of messages
-            fetchMessages(startId + 50);
-          }
-        } catch (err: any) {
-          if (err.response && err.response.status === 404) {
-            // Stop fetching when a 404 status code is received
-            setAuth((prevAuth) => ({ ...prevAuth, isLoading: false }));
-          } else {
-            console.error(err);
-            setAuth((prevAuth) => ({ ...prevAuth, isLoading: false }));
-          }
-        }
+
+            if (response.status === 200) {
+              setAuth((prevAuth) => ({
+                ...prevAuth,
+                emails: [...prevAuth.emails, ...response.data],
+              }));
+              // Fetch the next batch of messages
+              fetchMessages(startId + 50);
+            }
+          })
+          .catch((err: any) => {
+            if (err.response && err.response.status === 404) {
+              // Stop fetching when a 404 status code is received
+              setAuth((prevAuth) => ({ ...prevAuth, isLoading: false }));
+            } else {
+              console.error(err);
+              setAuth((prevAuth) => ({ ...prevAuth, isLoading: false }));
+            }
+          });
       };
 
       // Start fetching messages
