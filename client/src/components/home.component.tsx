@@ -10,6 +10,7 @@ const Home = ({
 }: any) => {
   const [greeting, setGreeting] = useState<string>();
   const [viewMode, setViewMode] = useState<string | number>("list");
+  const [selectedEmail, setSelectedEmail] = useState<any>(null);
 
   useEffect(() => {
     const currentHour = new Date().getHours();
@@ -19,9 +20,8 @@ const Home = ({
   }, []);
 
   const switchMode = (target: number) => {
-    console.log("Switching to", target);
-
     setViewMode(target);
+    setSelectedEmail(auth.emails.find((email: any) => email.seqno === target));
   };
 
   return (
@@ -52,14 +52,25 @@ const Home = ({
       ) : (
         <div>
           <div className="email p-10">
-            <p>From : {auth.emails[viewMode].from}</p>
-            <p>Subject : {auth.emails[viewMode].subject}</p>
-            <p>Date : {new Date(auth.emails[viewMode].date).toDateString()}</p>
-            <div
-              dangerouslySetInnerHTML={{
-                __html: auth.emails[viewMode].body,
-              }}
-            ></div>
+            {selectedEmail ? (
+              <>
+                <pre>
+                  From &nbsp;&nbsp;&nbsp;: {selectedEmail.from}
+                  <br />
+                  Subject : {selectedEmail.subject}
+                  <br />
+                  Date &nbsp;&nbsp;&nbsp;:{" "}
+                  {new Date(selectedEmail.date).toDateString()}
+                </pre>
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: selectedEmail.body,
+                  }}
+                ></div>
+              </>
+            ) : (
+              <p>Email not found</p>
+            )}
           </div>
         </div>
       )}
