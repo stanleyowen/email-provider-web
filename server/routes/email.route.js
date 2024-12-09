@@ -3,6 +3,104 @@ const Imap = require("node-imap");
 const { simpleParser } = require("mailparser");
 const nodemailer = require("nodemailer");
 
+router.post("/:seqno", async (req, res) => {
+  console.log("Fetching email with seqno: " + req.params.seqno);
+  const { email, password, incomingMailServer: host } = req.body;
+  const { seqno } = req.params;
+
+  const imap = new Imap({
+    user: email,
+    password: password,
+    host: host,
+    port: 993,
+    tls: true,
+  });
+
+  function openInbox(cb) {
+    imap.openBox("INBOX", true, cb);
+  }
+
+  imap.once("ready", function () {
+    openInbox(function (err, box) {
+      if (err) {
+        console.log("Failed to open inbox: " + err);
+        return res.status(500).json({
+          code: 500,
+          error: "Failed to open inbox",
+        });
+      }
+
+      const f = imap.seq.fetch(seqno, {
+        bodies: "",
+        struct: true,
+      });
+
+      const messages = [];
+
+      f.on("message", function (msg, seqno) {
+        const message = { seqno, headers: {}, body: "", attributes: null };
+        msg.on("body", function (stream, info) {
+          let buffer = "";
+          stream.on("data", function (chunk) {
+            buffer += chunk.toString("utf8");
+          });
+          stream.once("end", async function () {
+            try {
+              const parsed = await simpleParser(buffer);
+              message.body = parsed.html || parsed.text;
+              message.headers = parsed.headers;
+              message.from = parsed.from.text;
+              message.to = parsed.to.text;
+              message.subject = parsed.subject;
+              message.date = parsed.date;
+            } catch (err) {
+              console.log("Error parsing email: " + err);
+            }
+          });
+        });
+        msg.once("attributes", function (attrs) {
+          message.attributes = attrs;
+        });
+        msg.once("end", function () {
+          messages.push(message);
+        });
+      });
+
+      f.once("error", function (err) {
+        console.log("Fetch error: " + err);
+        return res.status(500).json({
+          code: 500,
+          error: "Failed to fetch message",
+        });
+      });
+
+      f.once("end", function () {
+        console.log("Done fetching message!");
+        imap.end();
+
+        if (messages.length === 0) {
+          return res.status(404).json({
+            code: 404,
+            error: "Message not found",
+          });
+        }
+
+        res.send(JSON.stringify(messages[0], null, 2));
+      });
+    });
+  });
+
+  imap.once("error", function (err) {
+    console.log(err);
+    return res.status(500).json({
+      code: 500,
+      error: "Failed to connect to IMAP server",
+    });
+  });
+
+  imap.connect();
+});
+
 router.post("/", async (req, res) => {
   // Get the email address, password, and host from the body
   const { email, password, incomingMailServer: host, startId } = req.body;
@@ -150,7 +248,7 @@ router.post("/send", async (req, res) => {
   if (!email || !password || !host || !to || !subject || !text) {
     return res.status(400).send(
       JSON.stringify({
-        code: 403,
+        code: 400,
         error: "Email, password, host, to, subject, and text are required",
       })
     );
@@ -184,7 +282,16 @@ router.post("/send", async (req, res) => {
       });
     } else {
       console.log("Email sent: " + info.response);
-      res.send(JSON.stringify({ message: "Email sent" }, null, 2));
+      res.send(
+        JSON.stringify(
+          {
+            code: 200,
+            message: "Email sent successfully",
+          },
+          null,
+          2
+        )
+      );
     }
   });
 });
@@ -233,7 +340,14 @@ router.delete("/", async (req, res) => {
 
           console.log("Email deleted successfully.");
           res.send(
-            JSON.stringify({ message: "Email deleted successfully." }, null, 2)
+            JSON.stringify(
+              {
+                code: 200,
+                message: "Email deleted successfully.",
+              },
+              null,
+              2
+            )
           );
           imap.end();
         });
