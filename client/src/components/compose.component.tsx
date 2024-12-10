@@ -64,17 +64,33 @@ const ComposeEmail = ({ auth, handleCredential }: AuthInterface) => {
       parseError("Something went wrong. Please try again");
     }
 
-    // Check if the email is valid
-    else if (!data.email.includes("@") || !data.email.includes(".")) {
-      parseError("Invalid email address");
-    } else if (data.to === "" || data.subject === "" || data.text === "") {
+    // Check if the required fields are filled
+    else if (data.to === "" || data.subject === "" || data.text === "") {
       parseError("Please fill in the required fields");
+    }
+
+    // Check if the email is valid and between 6 to 254 characters
+    else if (data.to.length < 6 || data.to.length > 254) {
+      parseError("Email address must be between 6 to 254 characters");
+    }
+
+    // Check if the email is valid
+    else if (!data.to.includes("@") || !data.to.includes(".")) {
+      parseError("Invalid email address");
+    }
+
+    // Check if the subject is not more than 989 characters
+    else if (data.subject.length > 989) {
+      parseError("Subject is too long. Please make it under 989 characters");
+    }
+
+    // Check if the message size is more than 10MB
+    else if (data.text.length > 100000000) {
+      parseError("Message is too large");
     }
 
     // Check if the to, cc, and bcc fields are valid emails if they are not empty
     else if (
-      !data.to.includes("@") ||
-      !data.to.includes(".") ||
       (data.cc !== "" && (!data.cc.includes("@") || !data.cc.includes("."))) ||
       (data.bcc !== "" && (!data.bcc.includes("@") || !data.bcc.includes(".")))
     ) {

@@ -53,9 +53,32 @@ const Auth = ({ auth, handleCredential }: AuthInterface) => {
       parseError("Make sure to fill all the required fields");
     }
 
-    // Check if the email is valid
+    // Check if the emial is valid and between 6 to 254 characters
+    else if (data.email.length < 6 || data.email.length > 254) {
+      parseError("Email address must be between 6 to 254 characters");
+    }
+
+    // Check if the email has a valid format
     else if (!data.email.includes("@") || !data.email.includes(".")) {
       parseError("Invalid email address");
+    }
+
+    // Check if the mail server is valid and between 4 to 254 characters
+    else if (
+      data.incomingMailServer.length < 4 ||
+      data.incomingMailServer.length > 254 ||
+      data.outgoingMailServer.length < 4 ||
+      data.outgoingMailServer.length > 254
+    ) {
+      parseError("Mail server must be between 4 to 254 characters");
+    }
+
+    // Check if the mail server has a valid domain
+    else if (
+      !data.incomingMailServer.includes(".") ||
+      !data.outgoingMailServer.includes(".")
+    ) {
+      parseError("Invalid mail server domain");
     }
 
     // Make the POST request to the server
@@ -96,7 +119,7 @@ const Auth = ({ auth, handleCredential }: AuthInterface) => {
           isError: false,
           message: null,
         }),
-      5000
+      10000
     );
   }
 
